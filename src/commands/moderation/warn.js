@@ -52,8 +52,28 @@ module.exports = {
 
 async function warn(issuer, target, reason) {
   const response = await warnTarget(issuer, target, reason);
-  if (typeof response === "boolean") return `${target.user.username} is warned!`;
+  if (typeof response === "boolean") {
+    await sendWarningDM(target, reason);
+    return `${target.user.username} is warned!`;
+  }
   if (response === "BOT_PERM") return `I do not have permission to warn ${target.user.username}`;
   else if (response === "MEMBER_PERM") return `You do not have permission to warn ${target.user.username}`;
   else return `Failed to warn ${target.user.username}`;
+}
+
+async function sendWarningDM(target, reason) {
+  const warnings = await getWarnings(target.id);
+  const warningNumber = warnings.length + 1;
+  const dmMessage = `You have been warned.\nWarning number: ${warningNumber}\nReason: ${reason}`;
+  await target.send(dmMessage);
+  await saveWarning(target.id, reason);
+}
+
+async function getWarnings(userId) {
+  // Implement your logic to fetch warnings for the user from your database or storage
+  return []; // Placeholder
+}
+
+async function saveWarning(userId, reason) {
+  // Implement your logic to save the warning details to your database or storage
 }
